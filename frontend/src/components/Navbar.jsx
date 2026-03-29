@@ -1,13 +1,20 @@
-import React, { useState, useRef, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { Search, MessageSquare, Bell, User, Menu, X, Home, List, PlusCircle } from "lucide-react"
+import React, { useState, useRef, useEffect, useContext } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Search, MessageSquare, Bell, Menu, X, Home, List, PlusCircle } from "lucide-react"
+import axios  from "axios" // Ensure this matches your setup, usually it's just `import axios from "axios"`
+import { authDataContext } from '../context/AuthContext.jsx'
+import { userDataContext } from "../context/UserContext.jsx"
 
 export function Navbar({ onSearch }) {
+  let { userData, setUserData } = useContext(userDataContext)
+  let { serverUrl } = useContext(authDataContext)
+
   const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const dropdownRef = useRef(null)
   
+  const dropdownRef = useRef(null)
+  const navigate = useNavigate()
   const location = useLocation()
   const currentPath = location.pathname
 
@@ -31,12 +38,31 @@ export function Navbar({ onSearch }) {
 
   const navItems = [
     { path: "/", label: "Home", icon: Home },
-    { path: "/browse", label: "Browse Items", icon: List },
+    { path: "/search", label: "Search Items", icon: List },
     { path: "/report", label: "Report Item", icon: PlusCircle },
   ]
 
+  const handleLogOut = async () => {
+    try {
+      // Call backend logout
+      await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
+      
+      // Clear any storage
+      localStorage.clear()
+      sessionStorage.clear()
+      
+      // Navigate with replace to prevent back button
+      navigate("/login", { replace: true })
+    } catch (error) {
+      console.log("Logout error:", error)
+      localStorage.clear()
+      sessionStorage.clear()
+      navigate("/login", { replace: true })
+    }
+  }
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm shadow-sm">
+    <header className="sticky top-0 mb-2 -mt-4 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         
         {/* Logo */}
@@ -112,19 +138,36 @@ export function Navbar({ onSearch }) {
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="p-1 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
             >
-              <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
-                <User className="h-4 w-4 text-blue-600" />
+              {/* UI Avatar Replacement Here */}
+              <div className="h-8 w-8 rounded-full flex items-center justify-center border border-gray-200 overflow-hidden shadow-sm">
+                <img 
+                  src={`https://ui-avatars.com/api/?name=${userData?.name || 'U'}&background=2563eb&color=fff`} 
+                  alt="User Avatar"
+                  className="h-full w-full object-cover"
+                />
               </div>
             </button>
 
             {userMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</button>
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Reports</button>
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</button>
+                <button 
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                  onClick={() => {
+                    navigate("/profile");
+                    setUserMenuOpen(false); 
+                  }}
+                >
+                  Profile
+                </button>
+              
                 <div className="h-px bg-gray-200 my-1"></div>
-                <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Log out</button>
-              </div>
+                <button 
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" 
+                  onClick={handleLogOut}
+                >
+                  Log out
+                </button>
+              </div> 
             )}
           </div>
 
