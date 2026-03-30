@@ -10,6 +10,8 @@ import { Server } from "socket.io"
 import authRouter from "./routes/auth.routes.js"
 import isAuth from "./middleware/isAuth.js"
 import { getCurrentUser } from "./controllers/user.controller.js"
+import reportRouter from "./routes/report.routes.js"
+import matchingRouter from "./routes/matching.routes.js"
 
 dotenv.config()
 let app=express()
@@ -35,6 +37,8 @@ let port=process.env.PORT || 5000
 app.use("/api/auth",authRouter)
 
 app.get("/currentuser",isAuth,getCurrentUser)
+app.use("/api/report", reportRouter);
+app.use("/api/matching", matchingRouter);
 // app.use("/api/user",userRouter)
 // app.use("/api/post",postRouter)
 // app.use("/api/connection",connectionRouter)

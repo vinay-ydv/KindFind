@@ -7,8 +7,8 @@ export function ItemCard({ item, onClick }) {
     found: "bg-green-500 text-white",
   }
 
-  // Fallback to 'lost' color if the status text is weirdly formatted
-  const badgeColor = statusColors[item?.status?.toLowerCase()] || statusColors.lost
+  // CHANGE: Use reportType instead of status
+  const badgeColor = statusColors[item?.reportType?.toLowerCase()] || statusColors.lost
 
   return (
     <div
@@ -23,9 +23,9 @@ export function ItemCard({ item, onClick }) {
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         
-        {/* Status Badge */}
+        {/* Status Badge - CHANGE: Display reportType */}
         <span className={`absolute top-3 left-3 ${badgeColor} px-2.5 py-1 rounded-full uppercase text-xs font-semibold shadow-sm`}>
-          {item.status}
+          {item.reportType}
         </span>
 
         {/* Potential Match Badge */}
@@ -50,7 +50,8 @@ export function ItemCard({ item, onClick }) {
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4 flex-shrink-0 text-gray-400" />
-            <span>{item.date}</span>
+            {/* CHANGE: Format the MongoDB date string */}
+            <span>{new Date(item.date).toLocaleDateString()}</span>
           </div>
         </div>
 

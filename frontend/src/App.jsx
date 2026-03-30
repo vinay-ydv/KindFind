@@ -62,7 +62,7 @@ const AppContent = () => {
           />
           <Route path="/report" element={<Report />} />
           <Route path="/messages" element={<Chat />} />
-          <Route path="/matching" element={<Matching/>}/>
+          <Route path="/matching/:id" element={<Matching/>}/>
           <Route path="/profile" element={<Profile/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/signup" element={<Signup/>}/>

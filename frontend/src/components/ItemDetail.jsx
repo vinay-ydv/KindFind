@@ -2,7 +2,6 @@ import React, { useEffect } from "react"
 import { X, MapPin, Calendar, Tag, User, MessageSquare, Sparkles, ArrowRight } from "lucide-react"
 
 export function ItemDetail({ item, isOpen, onClose, onViewMatch, onContactUser }) {
-  // Handle Escape key to close the modal
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose()
@@ -11,7 +10,6 @@ export function ItemDetail({ item, isOpen, onClose, onViewMatch, onContactUser }
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  // Don't render anything if the modal shouldn't be open or if there's no item
   if (!isOpen || !item) return null
 
   const statusColors = {
@@ -19,15 +17,14 @@ export function ItemDetail({ item, isOpen, onClose, onViewMatch, onContactUser }
     found: "bg-green-500 text-white",
   }
 
-  // Fallback to 'lost' color if the status text isn't formatted right
-  const badgeColor = statusColors[item?.status?.toLowerCase()] || statusColors.lost
+  // CHANGE: Use reportType
+  const badgeColor = statusColors[item?.reportType?.toLowerCase()] || statusColors.lost
 
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-      onClick={onClose} // Clicking the background closes the modal
+      onClick={onClose}
     >
-      {/* Modal Container - stopPropagation prevents closing when clicking the card itself */}
       <div
         className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative flex flex-col"
         onClick={(e) => e.stopPropagation()}
@@ -63,20 +60,26 @@ export function ItemDetail({ item, isOpen, onClose, onViewMatch, onContactUser }
         )}
 
         {/* Image Section */}
-        <div className={`relative aspect-video w-full overflow-hidden bg-gray-100 ${!item.potentialMatch ? 'mt-0' : 'mt-4'}`}>
+        {/* Image Section - UPDATED for full image visibility */}
+        {/* Dynamic Height Approach (No letterboxing, but changing modal height) */}
+        {/* Constrained Height Approach */}
+        <div className={`relative w-full bg-gray-900 flex justify-center overflow-hidden ${!item.potentialMatch ? 'mt-0' : 'mt-4'}`}>
           <img
             src={item.image}
             alt={item.title}
-            className="h-full w-full object-cover"
+            // max-h-[50vh] stops the image from taking up more than half the screen height
+            // object-contain ensures the image shrinks proportionally to fit that limit
+            className="w-full max-h-[50vh] object-contain block" 
           />
+          
           {/* Status Badge */}
           <span className={`absolute top-4 left-4 ${badgeColor} px-3 py-1 rounded-full uppercase text-sm font-bold shadow-md`}>
-            {item.status}
+            {item.reportType}
           </span>
-          {/* Floating Close Button */}
+          
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 bg-black/40 hover:bg-black/60 text-white rounded-full transition-colors backdrop-blur-md"
+            className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full transition-colors backdrop-blur-md"
           >
             <X className="h-5 w-5" />
           </button>
@@ -96,7 +99,8 @@ export function ItemDetail({ item, isOpen, onClose, onViewMatch, onContactUser }
             </div>
             <div className="flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
-              <span>{item.date}</span>
+              {/* CHANGE: Format MongoDB Date */}
+              <span>{new Date(item.date).toLocaleDateString()}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Tag className="h-4 w-4" />
@@ -112,14 +116,22 @@ export function ItemDetail({ item, isOpen, onClose, onViewMatch, onContactUser }
             <p className="text-gray-600 leading-relaxed text-sm">{item.description}</p>
           </div>
 
-          {/* Reporter Info */}
+          {/* Reporter Info - CHANGE: Dynamic Author Data */}
           <div className="mt-6 flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100">
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-              <User className="h-5 w-5 text-blue-600" />
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 overflow-hidden">
+              {item.author?.profileImage ? (
+                <img src={item.author.profileImage} alt={item.author.name} className="h-full w-full object-cover" />
+              ) : (
+                <User className="h-5 w-5 text-blue-600" />
+              )}
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">Reported by John D.</p>
-              <p className="text-xs text-gray-500">Member since Jan 2024</p>
+              <p className="text-sm font-medium text-gray-900">
+                Reported by {item.author?.name || "Unknown User"}
+              </p>
+              <p className="text-xs text-gray-500">
+                Reported on {new Date(item.createdAt).toLocaleDateString()}
+              </p>
             </div>
           </div>
 

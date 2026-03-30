@@ -1,7 +1,11 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { MapPin, Calendar, ImagePlus } from "lucide-react"
-import { Navbar } from "../components/Navbar"
+import { MapPin, Calendar, ImagePlus, Loader2 } from "lucide-react" // Added Loader2 for loading state
+import { Navbar } from "../components/Navbar.jsx"
+import axios from "axios" // Import axios
+import { authDataContext } from "../context/AuthContext.jsx"
+import { useContext } from "react"
+import { LocationAutocomplete } from "../components/LocationAutocomplete.jsx"
 
 const categories = [
   "Electronics",
@@ -16,18 +20,27 @@ const categories = [
 ]
 
 export function Report() {
-  const navigate = useNavigate() // Added for routing
-  
+  const navigate = useNavigate()
+   let { serverUrl } = useContext(authDataContext)
   const [reportType, setReportType] = useState("lost")
   const [date, setDate] = useState("")
-  const [uploadedImage, setUploadedImage] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false) // Added loading state
+
+  // Separate states for UI preview and actual file (matching your Home.jsx logic)
+  const [uploadedImagePreview, setUploadedImagePreview] = useState(null) // Frontend preview
+  const [imageFile, setImageFile] = useState(null) // Backend file
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     location: "",
   })
+
+  // You can bring in your serverUrl from context here if you have it set up globally:
+  // const { serverUrl } = useContext(authDataContext)
+  // Replace/remove if using context
 
   const handleDragOver = (e) => {
     e.preventDefault()
@@ -43,32 +56,57 @@ export function Report() {
     setIsDragging(false)
     const file = e.dataTransfer.files[0]
     if (file && file.type.startsWith("image/")) {
-      const url = URL.createObjectURL(file)
-      setUploadedImage(url)
+      setImageFile(file)
+      setUploadedImagePreview(URL.createObjectURL(file))
     }
   }
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0]
     if (file) {
-      const url = URL.createObjectURL(file)
-      setUploadedImage(url)
+      setImageFile(file) // Store file for backend
+      setUploadedImagePreview(URL.createObjectURL(file)) // Show preview on frontend
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsSubmitting(true)
     
-    // 1. Gather all the data
-    const submittedItem = {
-      ...formData,
-      reportType,
-      date: date || new Date().toISOString().split('T')[0],
-      image: uploadedImage,
+    try {
+      // 1. Create FormData just like in Home.jsx
+      let submitData = new FormData()
+      submitData.append("title", formData.title)
+      submitData.append("description", formData.description)
+      submitData.append("category", formData.category)
+      submitData.append("location", formData.location)
+      submitData.append("reportType", reportType)
+      submitData.append("date", date || new Date().toISOString().split('T')[0])
+      
+      // Append image if it exists
+      if (imageFile) {
+        submitData.append("image", imageFile)
+      }
+
+      // 2. Make the API call
+      let result = await axios.post(`${serverUrl}/api/report/create`, submitData, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" }
+      })
+
+      // 3. Extract the new item's ID from the response
+      const newItemId = result.data.report._id; 
+      
+      // console.log("Successfully created ID:", newItemId);
+      // 4. Navigate to matching page with the new ID
+      navigate(`/matching/${newItemId}`)
+
+    } catch (error) {
+      console.error("Error creating report:", error)
+      // Optional: Add some user feedback here (e.g., toast notification)
+    } finally {
+      setIsSubmitting(false)
     }
-    
-    // 2. Navigate to the matching page and pass the data inside the route state
-    navigate("/matching", { state: { submittedItem } })
   }
 
   return (
@@ -128,22 +166,25 @@ export function Report() {
                   isDragging
                     ? "border-blue-500 bg-blue-50"
                     : "border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100"
-                } ${uploadedImage ? "p-2" : ""}`}
+                } ${uploadedImagePreview ? "p-2" : ""}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                {uploadedImage ? (
+                {uploadedImagePreview ? (
                   <div className="relative">
                     <img
-                      src={uploadedImage}
+                      src={uploadedImagePreview}
                       alt="Uploaded preview"
                       className="w-full h-48 object-cover rounded-lg"
                     />
                     <button
                       type="button"
                       className="absolute top-2 right-2 bg-white/90 text-gray-700 hover:bg-white px-3 py-1.5 rounded-md text-sm font-medium shadow-sm transition-colors"
-                      onClick={() => setUploadedImage(null)}
+                      onClick={() => {
+                        setUploadedImagePreview(null)
+                        setImageFile(null)
+                      }}
                     >
                       Remove
                     </button>
@@ -248,28 +289,32 @@ export function Report() {
             </div>
 
             {/* Location */}
+            {/* Location */}
             <div className="space-y-2">
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                <input
-                  id="location"
-                  type="text"
-                  required
-                  placeholder="Where was the item lost/found?"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
+              <label className="block text-sm font-medium text-gray-700">Location</label>
+              
+              {/* WE REPLACED THE OLD INPUT WITH THIS: */}
+              <LocationAutocomplete 
+                value={formData.location}
+                onChange={(newLocation) => setFormData({ ...formData, location: newLocation })}
+              />
+              
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-sm mt-4"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-sm mt-4 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Submit Report
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Submitting Report...
+                </>
+              ) : (
+                "Submit Report"
+              )}
             </button>
           </form>
         </div>
