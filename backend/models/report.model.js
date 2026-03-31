@@ -38,6 +38,11 @@ const reportSchema = new mongoose.Schema({
   },
   image: {
     type: String, // This will store the Cloudinary/S3 URL when you upload images
+    default: "",
+    required:true
+  },
+  aiTags: {
+    type: String, 
     default: ""
   },
   matchStatus: {

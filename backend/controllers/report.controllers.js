@@ -1,47 +1,71 @@
 import Report from "../models/report.model.js"; // Adjust if your file is named differently
 import uploadOnCloudinary from "../config/cloudinary.js";
 
-export const createReport = async (req, res) => {
-//   console.log("=== [POST /report/create] Incoming request ===");
-//   console.log("Body:", req.body);
-//   console.log("UserID from auth middleware:", req.userId);
-//   console.log("File info:", req.file);
+// 1. IMPORT THE NEW SDK
+import { GoogleGenAI } from "@google/genai";
 
+// 2. INITIALIZE THE NEW CLIENT (It automatically looks for process.env.GEMINI_API_KEY)
+const ai = new GoogleGenAI({});
+
+// Helper function to calculate Cosine Similarity for AI matching
+
+
+// Create Report 
+export const createReport = async (req, res) => {
   try {
     const { title, description, category, location, reportType, date } = req.body;
 
-    // Validate required fields based on your Mongoose Schema
     if (!title || !description || !category || !location || !reportType || !date) {
-      console.warn("[createReport] Validation failed: Missing required fields");
-      return res.status(400).json({ 
-        message: "Please provide all required fields: title, description, category, location, reportType, and date" 
-      });
+      return res.status(400).json({ message: "Please provide all required fields" });
     }
 
     let imageUrl = "";
+    let generatedTags = "";
 
-    // Handle Image Upload if a file was provided
     if (req.file) {
       const filePath = req.file.path;
-    //   console.log("[createReport] File received at path:", filePath);
-
+      
       try {
         imageUrl = await uploadOnCloudinary(filePath);
-        // console.log("[createReport] Image uploaded to Cloudinary:", imageUrl);
       } catch (cloudError) {
         console.error("[createReport] Cloudinary upload failed:", cloudError);
-        return res.status(500).json({ 
-          message: "Image upload failed",
-          error: cloudError.message 
-        });
+        return res.status(500).json({ message: "Image upload failed", error: cloudError.message });
       }
-    } else {
-      console.log("[createReport] No file found, creating text-only report");
+
+      if (imageUrl) {
+        try {
+          const imageResponse = await fetch(imageUrl);
+          const imageBuffer = await imageResponse.arrayBuffer();
+          const mimeType = req.file.mimetype || "image/jpeg"; 
+
+          const prompt = "Analyze this lost and found item. Give me a comma-separated list of its main color, brand (if visible), material, category, shape, and any distinct features. Return ONLY the comma-separated words.";
+
+          // 3. USE THE NEW GEMINI 3 FLASH MODEL & SYNTAX
+          const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: [
+              prompt,
+              {
+                inlineData: {
+                  data: Buffer.from(imageBuffer).toString("base64"),
+                  mimeType: mimeType
+                }
+              }
+            ]
+          });
+          
+          // 4. NEW WAY TO GET TEXT (No parenthesis)
+          generatedTags = response.text.trim();
+          console.log("[createReport] Gemini Ai Tags Generated:", generatedTags);
+
+        } catch (aiError) {
+          console.error("[createReport] Gemini Tagging Failed:", aiError);
+        }
+      }
     }
 
-    // Create the Report in the database
     const newReport = await Report.create({
-      author: req.userId, // Pulled from your isAuth middleware
+      author: req.userId,
       title: title.trim(),
       description: description.trim(),
       category,
@@ -49,35 +73,26 @@ export const createReport = async (req, res) => {
       reportType,
       date,
       image: imageUrl,
+      aiTags: generatedTags 
     });
 
-    // console.log("[createReport] Report created successfully:", newReport._id);
-
-    return res.status(201).json({ 
-      message: "Report created successfully", 
-      report: newReport // Your frontend depends on this to get the new ID!
-    });
-
+    return res.status(201).json({ message: "Report created successfully", report: newReport });
   } catch (error) {
     console.error("[createReport] Unhandled error:", error);
-    console.error("[createReport] Error stack:", error.stack);
-    return res.status(500).json({ 
-      message: "Failed to create report",
-      error: error.message 
-    });
+    return res.status(500).json({ message: "Failed to create report", error: error.message });
   }
 };
 
 // Fetch all reports from all users
 export const getAllReports = async (req, res) => {
-  console.log("=== [GET /report/all] Fetching all reports ===");
+  
   try {
     // Find all reports, populate author details, and sort newest to oldest
     const reports = await Report.find()
       .populate("author", "-password")
       .sort({ createdAt: -1 });
 
-    console.log(`[getAllReports] Found ${reports.length} reports.`);
+    // console.log(`[getAllReports] Found ${reports.length} reports.`);
     return res.status(200).json({ reports });
   } catch (error) {
     console.error("[getAllReports] Error:", error);
