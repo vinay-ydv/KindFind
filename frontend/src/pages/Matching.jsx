@@ -5,92 +5,92 @@ import { Search, CheckCircle2, XCircle, Sparkles, ArrowLeft, MessageCircle, Plus
 import { ItemCard } from "../components/ItemCard.jsx" 
 import { Navbar } from "../components/Navbar.jsx"
 import { authDataContext } from "../context/AuthContext.jsx" 
+import { userDataContext } from "../context/UserContext.jsx" // <-- ADDED: Need this for chat routing
 
 export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
-  const { id } = useParams() // Grab the ID from the URL
+  const { id } = useParams() 
   const navigate = useNavigate()
   const { serverUrl } = useContext(authDataContext)
+  const { userData } = useContext(userDataContext) // <-- ADDED: Get current user ID
 
-  // Data States for the Report
+  // Data States
   const [submittedItem, setSubmittedItem] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  
+  // We store the fetched matches here temporarily while the animation runs
+  const [fetchedMatches, setFetchedMatches] = useState([])
 
   // Matching Animation States
   const [matchingPhase, setMatchingPhase] = useState("analyzing")
   const [progress, setProgress] = useState(0)
   const [matchedItems, setMatchedItems] = useState([])
-  const [itemAdded, setItemAdded] = useState(false)
 
-  // 1. Fetch ONLY the submitted report using the ID
+  // 1. Fetch the report AND the matches from the AI Backend
   useEffect(() => {
-    const fetchReport = async () => {
+    const fetchMatches = async () => {
       if (!id) return;
 
       try {
         setIsLoading(true);
         setError(null);
 
-        // Make call to your newly created report controller
-        const response = await axios.get(`${serverUrl}/api/matching/${id}`, {
+        // Fetching from your new matching endpoint
+        const response = await axios.get(`${serverUrl}/api/matching/findmatches/${id}`, {
           withCredentials: true
         });
 
-        // The backend returns res.json({ report: { ... } })
-        setSubmittedItem(response.data.report);
+        setSubmittedItem(response.data.sourceItem);
+        
+        // Grab only the top 2 matches to keep the UI clean
+        setFetchedMatches(response.data.matches.slice(0, 2));
 
       } catch (err) {
         console.error("Failed to fetch report details:", err);
-        setError("Could not load the report details. The ID might be invalid.");
+        setError("Could not load the report details or run the matching engine.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchReport();
+    fetchMatches();
   }, [id, serverUrl]);
 
-  // 2. Simulated Matching Logic (Temporarily kept here until we connect the separate matching API)
+  // 2. The "AI Processing" Animation
   useEffect(() => {
     if (!submittedItem) return;
 
     const runSimulatedMatching = async () => {
       setMatchingPhase("analyzing")
       for (let i = 0; i <= 30; i += 5) {
-        await new Promise(r => setTimeout(r, 100))
+        await new Promise(r => setTimeout(r, 80))
         setProgress(i)
       }
 
       setMatchingPhase("searching")
       for (let i = 30; i <= 70; i += 5) {
-        await new Promise(r => setTimeout(r, 100))
-        setProgress(i)
-      }
-
-      for (let i = 70; i <= 100; i += 5) {
         await new Promise(r => setTimeout(r, 80))
         setProgress(i)
       }
 
-      // We will replace this empty array with the actual matched data later
-      setMatchedItems([]) 
-      setItemAdded(true)
+      for (let i = 70; i <= 100; i += 5) {
+        await new Promise(r => setTimeout(r, 60))
+        setProgress(i)
+      }
+
+      setMatchedItems(fetchedMatches) 
       setMatchingPhase("complete")
     }
 
     runSimulatedMatching()
-  }, [submittedItem])
+  }, [submittedItem, fetchedMatches])
 
   const getPhaseMessage = () => {
     switch (matchingPhase) {
-      case "analyzing":
-        return "Analyzing your item details..."
-      case "searching":
-        return "Searching through existing database..."
-      case "complete":
-        return matchedItems.length > 0 ? "Potential matches found!" : "Search complete"
-      default:
-        return "Processing..."
+      case "analyzing": return "Analyzing item vectors & tags..."
+      case "searching": return "Comparing against database..."
+      case "complete": return matchedItems.length > 0 ? "Potential matches found!" : "Search complete"
+      default: return "Processing..."
     }
   }
 
@@ -102,7 +102,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
         <Navbar />
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
           <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
-          <p className="text-gray-500 font-medium">Fetching report details...</p>
+          <p className="text-gray-500 font-medium">Booting up matching engine...</p>
         </div>
       </>
     )
@@ -118,7 +118,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
           <p className="text-gray-600 mb-6">{error || "Item not found."}</p>
           <button 
             onClick={() => navigate('/report')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition cursor-pointer"
           >
             Go back to reporting
           </button>
@@ -136,7 +136,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
         <div className="flex items-center gap-4 mb-8">
           <button 
             onClick={() => navigate('/report')}
-            className="p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -202,7 +202,6 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
                   </div>
                 </div>
 
-                {/* NEW: Displaying the populated Author Info */}
                 {submittedItem.author && (
                   <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold overflow-hidden shrink-0">
@@ -260,7 +259,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
               </div>
             </div>
 
-            {/* Results Section (Only shows when phase is complete) */}
+            {/* Results Section */}
             {matchingPhase === "complete" && (
               <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 
@@ -270,31 +269,54 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
                       <div className="flex items-center gap-2 mb-1">
                         <Sparkles className="h-5 w-5 text-yellow-600" />
                         <h3 className="text-lg font-bold text-yellow-900">
-                          {matchedItems.length} Potential Match{matchedItems.length > 1 ? "es" : ""} Found!
+                          Top {matchedItems.length} AI Match{matchedItems.length > 1 ? "es" : ""} Found!
                         </h3>
                       </div>
                       <p className="text-sm text-yellow-800">
-                        We found items in the database that might match yours. Review them below.
+                        Our AI has analyzed descriptions and images to find these potential matches. 
                       </p>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       {matchedItems.map((item) => (
-                        <div key={item._id} className="relative group">
+                        <div key={item._id} className="relative group flex flex-col">
+                          
+                          {/* AI Match Percentage Badge */}
+                          <div className="absolute -top-3 -right-3 z-10 bg-green-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 border-2 border-white">
+                            {item.matchScore}% Match
+                          </div>
+
                           <ItemCard 
                             item={{...item, potentialMatch: true}} 
-                            onClick={() => onViewItem(item)} 
+                            onClick={() => {
+                              if (typeof onViewItem === 'function') onViewItem(item);
+                            }} 
                           />
-                          <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          
+                          {/* Contact Overlay on Hover */}
+                          {/* FIX: Re-added Safe Navigation Logic to Chat Page */}
+                          <div className="absolute inset-x-4 bottom-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                             <button 
-                              className="flex-1 flex items-center justify-center gap-1.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors"
+                              className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded-lg text-sm font-bold shadow-md transition-colors cursor-pointer"
                               onClick={(e) => {
-                                e.stopPropagation()
-                                onContactUser(item)
+                                e.stopPropagation();
+                                if (typeof onContactUser === 'function') {
+                                  onContactUser(item);
+                                } else {
+                                  // Fallback: Directly navigate to messages if prop is missing
+                                  navigate("/messages", {
+                                    state: {
+                                      itemId: item._id,
+                                      reporterId: item.author?._id || item.author,
+                                      viewerId: userData?._id,
+                                      itemDetails: item
+                                    }
+                                  });
+                                }
                               }}
                             >
-                              <MessageCircle className="h-3.5 w-3.5" />
-                              Contact
+                              <MessageCircle className="h-4 w-4" />
+                              Contact Reporter
                             </button>
                           </div>
                         </div>
@@ -317,16 +339,25 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
 
                 {/* Quick Actions */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  {/* FIX: Added explicit cursor-pointer */}
                   <button 
                     onClick={() => navigate('/report')}
-                    className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-3 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-3 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"
                   >
                     <Plus className="h-4 w-4" />
                     Report Another
                   </button>
+                  
+                  {/* FIX: Added Safe Navigation Fallback + cursor-pointer */}
                   <button 
-                    onClick={onBrowse}
-                    className="flex-1 flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 px-4 py-3 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    onClick={() => {
+                      if (typeof onBrowse === 'function') {
+                        onBrowse();
+                      } else {
+                        navigate('/search');
+                      }
+                    }}
+                    className="flex-1 flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 px-4 py-3 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"
                   >
                     Browse All Items
                   </button>

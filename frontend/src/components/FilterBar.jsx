@@ -121,23 +121,7 @@ export function FilterBar({ filters, onFilterChange }) {
           </div>
         </div>
 
-        {/* Date Range Picker (Native HTML) */}
-        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
-          <span className="text-sm text-gray-500">From</span>
-          <input
-            type="date"
-            value={dateRange.from}
-            onChange={(e) => handleDateChange("from", e.target.value)}
-            className="bg-transparent text-sm text-gray-700 focus:outline-none cursor-pointer"
-          />
-          <span className="text-sm text-gray-500 border-l pl-2 border-gray-300">To</span>
-          <input
-            type="date"
-            value={dateRange.to}
-            onChange={(e) => handleDateChange("to", e.target.value)}
-            className="bg-transparent text-sm text-gray-700 focus:outline-none cursor-pointer"
-          />
-        </div>
+       
 
         {/* Reset Button */}
         {activeFiltersCount > 0 && (

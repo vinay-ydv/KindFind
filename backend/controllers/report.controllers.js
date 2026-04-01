@@ -106,7 +106,7 @@ export const getAllReports = async (req, res) => {
 
 // Fetch ONLY the logged-in user's reports
 export const getMyReports = async (req, res) => {
-  console.log("=== [GET /report/my-reports] Fetching user reports ===");
+ 
   try {
     const reports = await Report.find({ author: req.userId }).sort({ createdAt: -1 });
     return res.status(200).json({ reports });
@@ -118,7 +118,7 @@ export const getMyReports = async (req, res) => {
 
 // Delete a report
 export const deleteReport = async (req, res) => {
-  console.log(`=== [DELETE /report/delete/${req.params.id}] ===`);
+ 
   try {
     const report = await Report.findById(req.params.id);
     
@@ -141,7 +141,7 @@ export const deleteReport = async (req, res) => {
 
 // Update a report
 export const updateReport = async (req, res) => {
-  console.log(`=== [PUT /report/update/${req.params.id}] ===`);
+
   try {
     const report = await Report.findById(req.params.id);
     

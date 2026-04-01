@@ -201,7 +201,7 @@ export function Profile() {
               <p className="text-slate-500 font-medium">You haven't reported any items yet.</p>
               <button 
                 onClick={() => navigate("/report")}
-                className="mt-4 text-blue-600 font-bold hover:underline"
+                className="mt-4 text-blue-600 font-bold cursor-pointer hover:underline"
               >
                 Report your first item
               </button>
@@ -287,7 +287,7 @@ export function Profile() {
         <div className="pt-8 flex justify-center">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-2 px-8 py-3 bg-red-600 text-white hover:bg-red-700 rounded-xl font-bold shadow-lg shadow-red-200 transition-all active:scale-95"
+            className="flex items-center gap-2 px-8 py-3 bg-red-600 cursor-pointer text-white hover:bg-red-700 rounded-xl font-bold shadow-lg shadow-red-200 transition-all active:scale-95"
           >
             <LogOut className="h-5 w-5" />
             Sign Out

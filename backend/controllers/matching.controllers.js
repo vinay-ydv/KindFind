@@ -1,30 +1,24 @@
-// Add this below your existing createReport function
-
 import Report from "../models/report.model.js";
-
+import Notification from "../models/notification.model.js"; // <-- Added Notification Model
 import { pipeline } from "@xenova/transformers";
 
+/////// NOT USED ////////
 export const getReportById = async (req, res) => {
-//   console.log(`=== [GET /report/${req.params.id}] Fetching specific report ===`);
-  
   try {
     const { id } = req.params;
 
     // Fetch the report and populate the author's basic info
-    // This sends the entire user document (I recommend adding "-password" so you don't accidentally send the user's password hash to the frontend!)
-const report = await Report.findById(id).populate("author", "-password");
+    const report = await Report.findById(id).populate("author", "-password");
 
     if (!report) {
       console.warn("[getReportById] Report not found for ID:", id);
       return res.status(404).json({ message: "Report not found" });
     }
 
-    // console.log("[getReportById] Successfully fetched report:", report.title);
     return res.status(200).json({ report });
     
   } catch (error) {
     console.error("[getReportById] Error:", error);
-    // Handle invalid MongoDB ObjectId format errors gracefully
     if (error.kind === 'ObjectId') {
        return res.status(400).json({ message: "Invalid report ID format" });
     }
@@ -34,13 +28,6 @@ const report = await Report.findById(id).populate("author", "-password");
     });
   }
 };
-
-
-
-
-
-// Initialize Gemini (Make sure to put your free API key in your .env file)
-
 
 // Helper function to calculate Cosine Similarity between two arrays of numbers
 function calculateCosineSimilarity(vecA, vecB) {
@@ -58,13 +45,13 @@ function calculateCosineSimilarity(vecA, vecB) {
 export const findMatches = async (req, res) => {
   try {
     const { id } = req.params;
-    // console.log(`id is ${id}`)
+    
     // 1. Get the source item the user just reported/clicked
     const sourceItem = await Report.findById(id).populate("author", "-password");
     if (!sourceItem) return res.status(404).json({ message: "Item not found" });
 
     // ==========================================
-    // PHASE 1: THE DATABASE PRE-FILTER (Your Request)
+    // PHASE 1: THE DATABASE PRE-FILTER 
     // ==========================================
     const oppositeType = sourceItem.reportType === "lost" ? "found" : "lost";
     
@@ -77,21 +64,17 @@ export const findMatches = async (req, res) => {
       _id: { $ne: sourceItem._id } // Don't match with itself
     }).populate("author", "-password");
 
-    // If no items in the same city/category, we stop here. Saves AI compute!
+    // If no items in the same city/category, we stop here.
     if (candidateItems.length === 0) {
       return res.status(200).json({ sourceItem, matches: [] });
     }
 
     // ==========================================
-    // PHASE 2: GENERATE SOURCE EMBEDDING (The "Brain")
-    
-    // Combine the user's text with the Gemini tags (assuming you saved Gemini tags to sourceItem.aiTags when they created the report)
+    // PHASE 2: GENERATE SOURCE EMBEDDING 
+    // ==========================================
     const sourceTextToEmbed = `${sourceItem.title}. ${sourceItem.description}. Tags: ${sourceItem.aiTags || ""}`;
     
-    // Load the free local HuggingFace model
     const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-    
-    // Convert text to numbers
     const sourceOutput = await extractor(sourceTextToEmbed, { pooling: 'mean', normalize: true });
     const sourceVector = Array.from(sourceOutput.data);
 
@@ -101,22 +84,16 @@ export const findMatches = async (req, res) => {
     const scoredMatches = [];
 
     for (const candidate of candidateItems) {
-      // Create the text to embed for the candidate
       const candidateText = `${candidate.title}. ${candidate.description}. Tags: ${candidate.aiTags || ""}`;
       
-      // Convert candidate text to numbers
       const candidateOutput = await extractor(candidateText, { pooling: 'mean', normalize: true });
       const candidateVector = Array.from(candidateOutput.data);
 
-      // Do the math! How similar are these two arrays of numbers? (Returns 0.0 to 1.0)
       const similarityScore = calculateCosineSimilarity(sourceVector, candidateVector);
-
-      // Convert to a clean percentage (e.g., 85)
       const matchPercentage = Math.round(similarityScore * 100);
 
       // If it's mathematically similar enough (e.g., over 60% match), add it to results
       if (matchPercentage > 60) {
-        // Convert Mongoose document to plain object to inject our custom match score
         const matchData = candidate.toObject();
         matchData.matchScore = matchPercentage; 
         scoredMatches.push(matchData);
@@ -126,6 +103,37 @@ export const findMatches = async (req, res) => {
     // Sort the matches so the highest percentage is at the top
     scoredMatches.sort((a, b) => b.matchScore - a.matchScore);
     
+    // ==========================================
+    // PHASE 4: SEND REAL-TIME NOTIFICATIONS
+    // ==========================================
+    // Grab the socket instance from Express
+    const io = req.app.get("io"); 
+
+    const sourceAuthorId = sourceItem.author._id.toString();
+
+    // Loop through the successful matches and notify the OTHER user
+    for (const match of scoredMatches) {
+      const matchAuthorId = match.author._id.toString();
+
+      // Don't notify yourself
+      if (matchAuthorId !== sourceAuthorId) {
+        
+        // 1. Save notification to Database
+        const newNotif = await Notification.create({
+          recipient: matchAuthorId,
+          sender: sourceAuthorId,
+          item: match._id, // The item they posted that got matched
+          message: `AI Match Found! A new ${sourceItem.reportType} item looks like an ${match.matchScore}% match for your post.`
+        });
+
+        // 2. Send Real-Time Socket Event to the recipient
+        if (io) {
+          const populatedNotif = await newNotif.populate("item");
+          io.emit(`new_notification_${matchAuthorId}`, populatedNotif);
+        }
+      }
+    }
+
     return res.status(200).json({ 
       success: true, 
       sourceItem, 

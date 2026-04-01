@@ -10,6 +10,8 @@ import { Matching } from './pages/Matching.jsx';
 import { Profile } from './pages/Profile.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
+import { Notification } from './pages/Notification.jsx';
+import { VideoCall } from './pages/VideoCall.jsx';
 
 // Import your components (adjust paths as needed to match your folders)
 
@@ -45,27 +47,31 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      
-      
+
+
       <main className="container mx-auto px-4 py-6">
         <Routes>
           {/* Your main routes */}
           <Route path="/" element={<Home />} />
-          <Route 
-            path="/search" 
+          <Route
+            path="/search"
             element={
               <Search
-                onItemClick={handleItemClick} 
-                searchQuery={searchQuery} 
+                onItemClick={handleItemClick}
+                searchQuery={searchQuery}
               />
-            } 
+            }
           />
           <Route path="/report" element={<Report />} />
           <Route path="/messages" element={<Chat />} />
-          <Route path="/matching/:id" element={<Matching/>}/>
-          <Route path="/profile" element={<Profile/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/signup" element={<Signup/>}/>
+          {/* <Route path="/matching/:id" element={<Matching/>}/> */}
+          \// Inside App.jsx routes:
+          <Route path="/matching/:id" element={<Matching onViewItem={handleItemClick} />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/notifications" element={<Notification onViewItem={handleItemClick} />}
+          /><Route path="/video-call/:roomId" element={<VideoCall />} />
           {/* Fallback route - sends users home if they type a bad URL */}
           <Route path="*" element={<Home />} />
         </Routes>
@@ -86,9 +92,9 @@ const AppContent = () => {
 // 2. Your main App wrapper
 const App = () => {
   return (
-    
-      <AppContent />
-    
+
+    <AppContent />
+
   );
 };
 
