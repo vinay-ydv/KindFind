@@ -24,7 +24,7 @@ const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
 
     //   if (!serverSecret || serverSecret === "b55d4d88bfeaacc428f0f5e170b571b1") {
     //       alert("Please paste your real ZEGOCLOUD Server Secret in the code!");
-    //       return;
+    //       retur;
     //   }
 
       // 2. Generate the Token (We force toString() just to be perfectly safe)

@@ -57,7 +57,7 @@ export const logIn = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      // secure: isProduction,
+      secure: isProduction,
       secure:false,
       sameSite: isProduction ? "none" : "lax",
       path: "/" // ✅ ADD THIS
@@ -74,7 +74,7 @@ export const logOut = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      // secure: isProduction,
+      secure: isProduction,
       secure: false,
       sameSite: isProduction ? "none" : "lax",
       path: "/" // MUST match the path used when setting
