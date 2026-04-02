@@ -25,7 +25,7 @@ const server = http.createServer(app);
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: ["http://localhost:5173"],
+    origin: ["https://kindfind-frontend.onrender.com"],
     credentials: true
 }))
 
@@ -34,7 +34,7 @@ app.use(cors({
 // =========================================================================
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin:  "https://kindfind-frontend.onrender.com",
     methods: ["GET", "POST"],
     credentials: true,
   },
