@@ -9,7 +9,7 @@ import {
 const chatRouter = express.Router();
 
 // Apply auth middleware to all chat routes (must be logged in to chat)
-chatRouter.use(isAuth); 
+// chatRouter.use(isAuth); 
 
 // Sidebar route
 chatRouter.get("/conversations", getUserConversations);

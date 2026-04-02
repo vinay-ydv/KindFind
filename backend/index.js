@@ -34,6 +34,7 @@ app.use(cors({
 // =========================================================================
 const io = new Server(server, {
   cors: {
+    // origin:  "https://kindfind-frontend.onrender.com",
     origin:  "https://kindfind-frontend.onrender.com",
     methods: ["GET", "POST"],
     credentials: true,
@@ -121,9 +122,9 @@ let port = process.env.PORT || 5000
 app.use("/api/auth", authRouter)
 app.get("/currentuser", isAuth, getCurrentUser)
 app.use("/api/report", reportRouter);
-app.use("/api/matching", matchingRouter);
-app.use("/api/chat", chatRouter)
-app.use("/api/notifications", notificationRouter)
+app.use("/api/matching",isAuth, matchingRouter);
+app.use("/api/chat",isAuth, chatRouter)
+app.use("/api/notifications",isAuth, notificationRouter)
 
 // 404
 app.use((req, res, next) => {

@@ -4,7 +4,7 @@ import { getUserNotifications, markAsRead } from "../controllers/notification.co
 
 const notificationRouter = express.Router();
 
-notificationRouter.use(isAuth);
+// notificationRouter.use(isAuth);
 notificationRouter.get("/", getUserNotifications);
 notificationRouter.put("/:id/read", markAsRead);
 
