@@ -34,7 +34,7 @@ app.use(cors({
 // =========================================================================
 const io = new Server(server, {
   cors: {
-    // origin:  "https://kindfind-frontend.onrender.com",
+    // origin:  "http://localhost:5173",
     origin:  "https://kindfind-frontend.onrender.com",
     methods: ["GET", "POST"],
     credentials: true,

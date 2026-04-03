@@ -1,5 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+
+// Import your components
 import { Navbar } from './components/Navbar.jsx';
 import { Home } from './pages/Home.jsx';
 import { Report } from './pages/Report.jsx';
@@ -12,18 +14,18 @@ import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import { Notification } from './pages/Notification.jsx';
 import { VideoCall } from './pages/VideoCall.jsx';
-import { Dashboard } from './pages/Dashboard.jsx'; // Don't forget to import Dashboard!
+import { userDataContext } from './context/UserContext.jsx';
+ // Assuming you have a Dashboard
 
 // Import your UserContext
-import { userDataContext } from './UserContext.jsx'; // Adjust this path if it's in a different folder
-
+ // Adjust path if needed
 
 // 1. Inner component where we can safely use useNavigate and manage state
 const AppContent = () => {
   const navigate = useNavigate();
   
-  // Get userData from Context
-  const { userData } = useContext(userDataContext);
+  // 1. Grab userData AND isLoading from your context
+  const { userData, isLoading } = useContext(userDataContext);
 
   // Global UI states for the search and the item detail modal
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,18 +52,30 @@ const AppContent = () => {
     navigate("/messages");
   };
 
+  // 2. The Loading Guard! 
+  // If context is still fetching the user, show this screen instead of the routes.
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center">
+          {/* A simple CSS spinner - replace with your own spinner if you have one */}
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading...</p> 
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Assuming Navbar is rendered somewhere here */}
+      {/* Assuming Navbar is rendered somewhere here or inside AppContent */}
+      {/* <Navbar onSearch={handleSearch} /> */}
       
       <main className="container mx-auto px-4 py-6">
         <Routes>
-          {/* PROTECTED ROUTES
-            If userData exists, render the component. 
-            If not, use <Navigate to="/login" /> to redirect them. 
-          */}
+          {/* PROTECTED ROUTES */}
           <Route path="/" element={userData ? <Home /> : <Navigate to="/login" />} />
-          <Route path="/dashboard" element={userData ? <Dashboard /> : <Navigate to="/login" />} />
+          
           
           <Route 
             path="/search" 
@@ -74,9 +88,7 @@ const AppContent = () => {
           <Route path="/notifications" element={userData ? <Notification onViewItem={handleItemClick} /> : <Navigate to="/login" />} />
           <Route path="/video-call/:roomId" element={userData ? <VideoCall /> : <Navigate to="/login" />} />
 
-          {/* PUBLIC / AUTH ROUTES
-            These do not check for userData so unauthenticated users can access them.
-          */}
+          {/* PUBLIC ROUTES */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 

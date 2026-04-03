@@ -193,7 +193,7 @@ const handleStartVideoCall = () => {
 
     // 1. Auto-send a message with the link so the other person can join
     const receiverId = getOtherUser(selectedConversation)._id;
-    const autoMessage = `🎥 I started a video call! Join here: ${callLink}`;
+    const autoMessage = `Click to join video call: ${callLink}`;
 
     // Optimistic UI update
     const tempMsg = {
@@ -215,6 +215,32 @@ const handleStartVideoCall = () => {
 
     // 2. Navigate the caller to the video room
     navigate(`/video-call/${roomId}`);
+  };
+  // Add this helper function inside your Chat component
+  const renderMessageText = (text, isMe) => {
+    if (!text) return null;
+    
+    // Regex to detect URLs (http, https, etc.)
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a 
+            key={index} 
+            href={part} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            // Style the link differently depending on if it's in a blue bubble or a white bubble
+            className={`underline font-semibold ${isMe ? "text-blue-100 hover:text-white" : "text-blue-600 hover:text-blue-800"}`}
+          >
+            {part}
+          </a>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
   };
   return (
     <>
@@ -334,7 +360,7 @@ const handleStartVideoCall = () => {
                   return (
                     <div key={msg._id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                       <div className={`max-w-[85%] md:max-w-[70%] rounded-2xl px-4 py-2 ${isMe ? "bg-blue-600 text-white rounded-br-sm" : "bg-white border border-gray-200 text-gray-900 rounded-bl-sm"}`}>
-                        <p className="text-sm break-words">{msg.text}</p>
+                       <p className="text-sm break-words">{renderMessageText(msg.text, isMe)}</p>
                         <div className={`flex items-center gap-1 mt-1 ${isMe ? "justify-end" : ""}`}>
                           <span className={`text-[10px] font-medium ${isMe ? "text-blue-100" : "text-gray-400"}`}>
                             {time}

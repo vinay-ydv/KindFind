@@ -9,20 +9,20 @@ const userSocketMap = new Map();
 export const initializeSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5173", // Your React frontend
+      origin:  "https://kindfind-frontend.onrender.com", // Your React frontend
       methods: ["GET", "POST"],
       credentials: true,
     },
   });
 
   io.on("connection", (socket) => {
-    console.log(`🔌 New client connected: ${socket.id}`);
+    // console.log(`🔌 New client connected: ${socket.id}`);
 
     // 1. REGISTER USER: When a user logs in or opens the app, map their DB ID to their Socket
     socket.on("register_user", (userId) => {
       if (userId) {
         userSocketMap.set(userId, socket.id);
-        console.log(`👤 User ${userId} is online.`);
+        // console.log(`👤 User ${userId} is online.`);
         // Tell everyone else this user is online (for the green dot in the UI)
         io.emit("user_status_change", { userId, status: "online" });
       }
@@ -31,7 +31,7 @@ export const initializeSocket = (server) => {
     // 2. JOIN ROOM: When a user clicks a specific chat in the sidebar
     socket.on("join_chat", (conversationId) => {
       socket.join(conversationId);
-      console.log(`🚪 User joined conversation room: ${conversationId}`);
+      // console.log(`🚪 User joined conversation room: ${conversationId}`);
     });
 
     // 3. SEND MESSAGE: The core chat engine
@@ -84,7 +84,7 @@ export const initializeSocket = (server) => {
 
     // 4. DISCONNECT: Clean up when they close the tab
     socket.on("disconnect", () => {
-      console.log(`🔌 Client disconnected: ${socket.id}`);
+      // console.log(`🔌 Client disconnected: ${socket.id}`);
       // Find the user ID based on the socket ID that just disconnected and remove them
       for (const [userId, socketId] of userSocketMap.entries()) {
         if (socketId === socket.id) {

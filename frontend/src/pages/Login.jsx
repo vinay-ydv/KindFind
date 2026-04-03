@@ -5,6 +5,7 @@ import { Search, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-re
 import { authDataContext } from '../context/AuthContext.jsx'
 // import { userDataContext } from '../context/UserContext.jsx'
 import axios from 'axios'
+import { userDataContext } from '../context/UserContext.jsx'
 
 
 
@@ -13,7 +14,7 @@ function Login() {
   let { serverUrl } = useContext(authDataContext)
   // let { userData, setUserData } = useContext(userDataContext)
   let navigate = useNavigate()
-  
+  const { setUserData } = useContext(userDataContext);
   let [email, setEmail] = useState("")
   let [password, setPassword] = useState("")
   let [loading, setLoading] = useState(false)
@@ -28,7 +29,7 @@ function Login() {
         password
       }, { withCredentials: true })
       
-      // setUserData(result.data)
+      setUserData(result.data)
       navigate("/")
       setErr("")
       setLoading(false)
