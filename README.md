@@ -11,7 +11,6 @@ communities to help each other.
 * **In-Browser Machine Learning:** Leverages local AI models to quickly classify and process text directly in the app.
 * **Real-Time Secure Chat:** Instant messaging powered by WebSockets to coordinate returns without exposing personal phone numbers.
 * **Live Video Verification:** Integrated voice and video calling to visually verify items and identity before meeting up.
-* **Location & Category Tracking:** Filter lost and found items precisely by category, date, and mapped locations.
 
 ## 🛠️ Tech Stack & Tools
 
@@ -27,7 +26,7 @@ communities to help each other.
 * **JWT & Bcrypt:** Ensures secure authentication, encrypted passwords, and protected user sessions.
 
 ### **AI & Cloud Integrations**
-* **Google Gemini API:** Cloud-based AI used for deep image recognition, OCR (extracting text from photos of found items), and complex data analysis.
+* **Google Gemini API:** Cloud-based AI used for deep image recognition.
 * **Xenova/Transformers.js:** Runs lightweight Machine Learning models directly in the browser/Node.js for lightning-fast semantic text matching and NLP (Natural Language Processing) without API latency.
 * **ZegoCloud:** SDK used to generate secure rooms and handle high-quality, peer-to-face video and voice calls.
 * **UI-Avatars:** Automatically generates customized user profile pictures based on name initials.
