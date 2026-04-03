@@ -25,17 +25,20 @@ const server = http.createServer(app);
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: ["https://kindfind-frontend.onrender.com"],
+    origin: [
+        "http://localhost:5173", 
+        "https://kindfind-frontend.onrender.com" // <--- ADD YOUR ACTUAL FRONTEND URL HERE
+    ],
     credentials: true
 }))
 
 // =========================================================================
 // SOCKET.IO LOGIC INJECTED DIRECTLY INTO INDEX.JS
 // =========================================================================
+
 const io = new Server(server, {
   cors: {
-    // origin:  "http://localhost:5173",
-    origin:  "https://kindfind-frontend.onrender.com",
+    origin: ["http://localhost:5173", "https://kindfind-frontend.onrender.com"], // <--- ADD HERE TOO
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -44,19 +47,19 @@ const io = new Server(server, {
 const userSocketMap = new Map(); 
 
 io.on("connection", (socket) => {
-  console.log(`🔌 New client connected: ${socket.id}`);
+  // console.log(`🔌 New client connected: ${socket.id}`);
 
   socket.on("register_user", (userId) => {
     if (userId) {
       userSocketMap.set(userId, socket.id);
-      console.log(`👤 User ${userId} is online.`);
+      // console.log(`👤 User ${userId} is online.`);
       io.emit("user_status_change", { userId, status: "online" });
     }
   });
 
   socket.on("join_chat", (conversationId) => {
     socket.join(conversationId);
-    console.log(`🚪 User joined conversation room: ${conversationId}`);
+    // console.log(`🚪 User joined conversation room: ${conversationId}`);
   });
 
   socket.on("send_message", async (data) => {
@@ -103,7 +106,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`🔌 Client disconnected: ${socket.id}`);
+    // console.log(`🔌 Client disconnected: ${socket.id}`);
     for (const [userId, socketId] of userSocketMap.entries()) {
       if (socketId === socket.id) {
         userSocketMap.delete(userId);
