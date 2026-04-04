@@ -31,5 +31,8 @@ communities to help each other.
 * **ZegoCloud:** SDK used to generate secure rooms and handle high-quality, peer-to-face video and voice calls.
 * **UI-Avatars:** Automatically generates customized user profile pictures based on name initials.
 
-Thanks for reading😊<img width="831" height="691" alt="image" src="https://github.com/user-attachments/assets/32d4f8e0-2762-466b-987e-e496c4375bfa" />
+Thanks for reading😊
+<img width="1899" height="875" alt="Screenshot 2026-04-03 115203" src="https://github.com/user-attachments/assets/3736e543-42ae-44c3-9cb1-44bdb45e8552" />
+<img width="973" height="867" alt="Screenshot 2026-04-03 115434" src="https://github.com/user-attachments/assets/a0af26f0-7195-42ed-80e2-db506dadc5f8" />
+
 
