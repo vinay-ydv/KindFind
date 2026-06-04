@@ -30,7 +30,7 @@ export const signUp = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       secure: isProduction ? true : false,
       sameSite: isProduction ? "none" : "lax",
-      path: "/" // ✅ ADD THIS
+      path: "/" 
     })
     return res.status(201).json(user)
 
@@ -60,7 +60,7 @@ export const logIn = async (req, res) => {
       secure: isProduction ? true : false,
      
       sameSite: isProduction ? "none" : "lax",
-      path: "/" // ✅ ADD THIS
+      path: "/" 
     })
     return res.status(200).json(user)
   } catch (error) {
@@ -69,7 +69,7 @@ export const logIn = async (req, res) => {
   }
 }
 
-// ✅ FIXED: Clear cookie with SAME options as when setting it
+
 export const logOut = async (req, res) => {
   try {
     res.clearCookie("token", {
@@ -77,7 +77,7 @@ export const logOut = async (req, res) => {
       secure: isProduction ? true : false,
       
       sameSite: isProduction ? "none" : "lax",
-      path: "/" // MUST match the path used when setting
+      path: "/" 
     })
     return res.status(200).json({ message: "log out successfully" })
   } catch (error) {

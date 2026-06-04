@@ -32,9 +32,7 @@ export function Chat() {
     scrollToBottom();
   }, [messages]);
 
-  // ==========================================
-  // 1. INITIALIZE SOCKET.IO
-  // ==========================================
+
   useEffect(() => {
     if (!serverUrl || !currentUserId) return;
 
@@ -48,9 +46,7 @@ export function Chat() {
     return () => newSocket.close();
   }, [serverUrl, currentUserId]);
 
-  // ==========================================
-  // 2. FETCH INITIAL DATA (REST API)
-  // ==========================================
+
   useEffect(() => {
     const initializeData = async () => {
       if (!currentUserId) return;
@@ -77,7 +73,7 @@ export function Chat() {
         } else {
           setConversations(loadedConversations);
           
-          // Optionally auto-select the most recent chat on desktop only
+       
           if (loadedConversations.length > 0 && window.innerWidth >= 768) {
             handleSelectConversation(loadedConversations[0]);
           }
@@ -90,9 +86,6 @@ export function Chat() {
     initializeData();
   }, [itemId, reporterId, currentUserId, serverUrl]);
 
-  // ==========================================
-  // 3. HANDLE SOCKET EVENTS (RECEIVING MESSAGES)
-  // ==========================================
   useEffect(() => {
     if (!socket) return;
 
@@ -135,9 +128,6 @@ export function Chat() {
     }
   }, [socket, selectedConversation]);
 
-  // ==========================================
-  // 4. UI HANDLERS
-  // ==========================================
   const handleSelectConversation = async (conversation) => {
     setSelectedConversation(conversation);
     try {
@@ -187,15 +177,15 @@ export function Chat() {
 const handleStartVideoCall = () => {
     if (!selectedConversation) return;
     
-    // We use the conversation ID as the secure video room ID
+   
     const roomId = selectedConversation._id;
     const callLink = `${window.location.origin}/video-call/${roomId}`;
 
-    // 1. Auto-send a message with the link so the other person can join
+    
     const receiverId = getOtherUser(selectedConversation)._id;
     const autoMessage = `Click to join video call: ${callLink}`;
 
-    // Optimistic UI update
+    
     const tempMsg = {
       _id: Date.now(),
       sender: { _id: currentUserId },
@@ -205,7 +195,7 @@ const handleStartVideoCall = () => {
     };
     setMessages((prev) => [...prev, tempMsg]);
 
-    // Send to backend socket
+  
     socket.emit("send_message", {
       conversationId: selectedConversation._id,
       senderId: currentUserId,
@@ -213,14 +203,14 @@ const handleStartVideoCall = () => {
       text: autoMessage
     });
 
-    // 2. Navigate the caller to the video room
+    
     navigate(`/video-call/${roomId}`);
   };
-  // Add this helper function inside your Chat component
+ 
   const renderMessageText = (text, isMe) => {
     if (!text) return null;
     
-    // Regex to detect URLs (http, https, etc.)
+    
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(urlRegex);
     
@@ -232,7 +222,7 @@ const handleStartVideoCall = () => {
             href={part} 
             target="_blank" 
             rel="noopener noreferrer" 
-            // Style the link differently depending on if it's in a blue bubble or a white bubble
+          
             className={`underline font-semibold ${isMe ? "text-blue-100 hover:text-white" : "text-blue-600 hover:text-blue-800"}`}
           >
             {part}
@@ -245,12 +235,10 @@ const handleStartVideoCall = () => {
   return (
     <>
       <Navbar />
-      {/* Set a consistent height across mobile and desktop */}
+     
       <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-10rem)] bg-white md:border border-gray-200 md:rounded-xl overflow-hidden flex shadow-sm max-w-7xl mx-auto md:mt-4">
         
-        {/* ============================== */}
-        {/* SIDEBAR: Hidden on mobile IF a chat is selected */}
-        {/* ============================== */}
+       
         <div className={`border-r border-gray-200 flex-col bg-gray-50/50 flex-shrink-0 transition-all duration-300 
           ${selectedConversation ? 'hidden md:flex' : 'flex w-full'} 
           md:w-80 lg:w-96`}
@@ -303,19 +291,17 @@ const handleStartVideoCall = () => {
           </div>
         </div>
 
-        {/* ============================== */}
-        {/* CHAT AREA: Hidden on mobile IF NO chat is selected */}
-        {/* ============================== */}
+    
         <div className={`flex-1 flex-col bg-white transition-all duration-300 
           ${!selectedConversation ? 'hidden md:flex' : 'flex w-full'}`}
         >
           {selectedConversation ? (
             <>
-              {/* Chat Header */}
+            
               <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white shadow-sm z-10">
                 <div className="flex items-center gap-3">
                   
-                  {/* MOBILE BACK BUTTON */}
+                 
                   <button 
                     onClick={() => setSelectedConversation(null)}
                     className="md:hidden p-2 -ml-2 mr-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded-full transition-colors"
@@ -344,7 +330,7 @@ const handleStartVideoCall = () => {
 </button>
               </div>
 
-              {/* Messages Area */}
+            
               <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50 space-y-4">
                 {messages.length === 0 && (
                   <div className="h-full flex flex-col items-center justify-center text-gray-400">
@@ -373,7 +359,7 @@ const handleStartVideoCall = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input Area */}
+             
               <div className="p-3 md:p-4 border-t border-gray-200 bg-white">
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                   <input

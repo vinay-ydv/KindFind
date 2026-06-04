@@ -4,7 +4,7 @@ import axios from "axios";
 import { authDataContext } from "../context/AuthContext.jsx";
 import { Navbar } from "../components/Navbar.jsx";
 
-// Notice we accept onViewItem so we can open the global modal!
+
 export function Notification({ onViewItem }) {
   const { serverUrl } = useContext(authDataContext);
   const [notifications, setNotifications] = useState([]);
@@ -22,13 +22,13 @@ export function Notification({ onViewItem }) {
   }, [serverUrl]);
 
   const handleNotificationClick = async (notification) => {
-    // 1. Mark as read in DB
+   
     if (!notification.isRead) {
       await axios.put(`${serverUrl}/api/notifications/${notification._id}/read`, {}, { withCredentials: true });
       setNotifications(prev => prev.map(n => n._id === notification._id ? { ...n, isRead: true } : n));
     }
     
-    // 2. Open the global ItemDetail Modal!
+   
     if (notification.item) {
       onViewItem(notification.item);
     }

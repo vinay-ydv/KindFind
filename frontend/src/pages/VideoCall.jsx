@@ -9,16 +9,16 @@ export function VideoCall() {
   const navigate = useNavigate();
   const { userData } = useContext(userDataContext);
   
-  // We use references so React doesn't accidentally join the room twice
+
   const containerRef = useRef(null);
   const zpRef = useRef(null); 
 
   useEffect(() => {
-    // Prevent running if the container isn't ready on the screen
+   
     if (!containerRef.current) return;
 
     const startCall = async () => {
-      // 1. VERIFY YOUR KEYS! (I see your App ID is correct)
+  
 const appID = Number(import.meta.env.VITE_ZEGO_APP_ID); 
       const serverSecret = import.meta.env.VITE_ZEGO_SERVER_SECRET;
 
@@ -27,7 +27,7 @@ const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
     //       retur;
     //   }
 
-      // 2. Generate the Token (We force toString() just to be perfectly safe)
+     
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
         serverSecret,
@@ -36,10 +36,10 @@ const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
         userData?.name               
       );
 
-      // 3. Create the UI Kit instance
+    
       zpRef.current = ZegoUIKitPrebuilt.create(kitToken);
 
-      // 4. Join the room safely
+    
       zpRef.current.joinRoom({
         container: containerRef.current,
         sharedLinks: [
@@ -60,8 +60,7 @@ const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
 
     startCall();
 
-    // 5. CRITICAL CLEANUP: When you leave the page, destroy the call instance
-    // This totally stops the "joinRoom repeat!!" crash!
+  
     return () => {
       if (zpRef.current) {
         zpRef.current.destroy();
@@ -71,10 +70,10 @@ const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
 
   return (
     <div className="h-screen w-screen bg-gray-900 relative">
-      {/* Custom Back Button */}
+    
       <button 
         onClick={() => {
-            // Manually destroy the call if they click the custom back arrow
+          
             if (zpRef.current) zpRef.current.destroy();
             navigate("/messages");
         }}
@@ -83,7 +82,7 @@ const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);
         <ArrowLeft className="h-6 w-6" />
       </button>
       
-      {/* The ZEGOCLOUD Video Container */}
+    
       <div ref={containerRef} className="w-full h-full" />
     </div>
   );

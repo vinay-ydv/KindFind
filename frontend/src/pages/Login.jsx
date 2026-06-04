@@ -45,7 +45,7 @@ function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 px-4">
       
-      {/* Brand Logo (Positioned above the card) */}
+     
       <div className="flex items-center gap-2 mb-8 transition-opacity hover:opacity-90">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 shadow-sm">
           <Search className="h-6 w-6 text-white" />
@@ -53,7 +53,7 @@ function Login() {
         <span className="text-2xl font-bold text-slate-900">MatchFound</span>
       </div>
 
-      {/* Login Card */}
+     
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8 sm:p-10">
         
         <div className="text-center mb-8">
@@ -63,7 +63,7 @@ function Login() {
 
         <form onSubmit={handleSignIn} className="space-y-5">
           
-          {/* Email Input */}
+          
           <div className="space-y-2">
             <label className="block text-sm font-medium text-slate-700">Email</label>
             <div className="relative">
@@ -79,7 +79,7 @@ function Login() {
             </div>
           </div>
 
-          {/* Password Input */}
+       
           <div className="space-y-2">
             <label className="block text-sm font-medium text-slate-700">Password</label>
             <div className="relative">
@@ -102,7 +102,7 @@ function Login() {
             </div>
           </div>
 
-          {/* Error Message Alert */}
+       
           {err && (
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
               <AlertCircle className="h-4 w-4 shrink-0" />
@@ -110,7 +110,7 @@ function Login() {
             </div>
           )}
 
-          {/* Submit Button */}
+        
           <button
             type="submit"
             disabled={loading}
@@ -127,7 +127,7 @@ function Login() {
           </button>
         </form>
 
-        {/* Redirect to Signup */}
+        
         <p className="text-center text-sm text-slate-500 mt-8">
           Don't have an account?{" "}
           <Link to="/signup" className="text-blue-600 font-semibold hover:text-blue-700 hover:underline">

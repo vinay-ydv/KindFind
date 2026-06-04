@@ -2,8 +2,7 @@ import { Server } from "socket.io";
 import Message from "../models/message.model.js";
 import Conversation from "../models/conversation.model.js";
 
-// We use a Map to keep track of which User ID belongs to which Socket ID
-// This lets us send notifications to a user even if they are on a different page!
+
 const userSocketMap = new Map(); 
 // not used ////////
 // export const initializeSocket = (server) => {

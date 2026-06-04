@@ -15,7 +15,7 @@ const categories = [
 ]
 
 export function FilterBar({ filters, onFilterChange }) {
-  // Using strings 'YYYY-MM-DD' for native HTML date inputs
+  
   const [dateRange, setDateRange] = useState({ from: "", to: "" })
 
   const handleStatusChange = (status) => {
@@ -58,8 +58,7 @@ export function FilterBar({ filters, onFilterChange }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6 shadow-sm">
       <div className="flex flex-wrap items-center gap-4">
-        
-        {/* Filter Header & Badge */}
+       
         <div className="flex items-center gap-2 text-gray-500">
           <Filter className="h-4 w-4" />
           <span className="text-sm font-medium">Filters</span>
@@ -70,7 +69,7 @@ export function FilterBar({ filters, onFilterChange }) {
           )}
         </div>
 
-        {/* Status Toggle */}
+       
         <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-1">
           {["all", "lost", "found"].map((status) => (
             <button
@@ -87,7 +86,7 @@ export function FilterBar({ filters, onFilterChange }) {
           ))}
         </div>
 
-        {/* Location Input */}
+       
         <div className="relative flex-1 min-w-[180px] max-w-[220px]">
           <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
@@ -99,7 +98,7 @@ export function FilterBar({ filters, onFilterChange }) {
           />
         </div>
 
-        {/* Category Select */}
+     
         <div className="relative">
           <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <select
@@ -113,7 +112,7 @@ export function FilterBar({ filters, onFilterChange }) {
               </option>
             ))}
           </select>
-          {/* Custom dropdown arrow to replace native one */}
+        
           <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -123,7 +122,7 @@ export function FilterBar({ filters, onFilterChange }) {
 
        
 
-        {/* Reset Button */}
+      
         {activeFiltersCount > 0 && (
           <button
             onClick={handleReset}

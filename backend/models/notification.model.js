@@ -7,12 +7,12 @@ const notificationSchema = new mongoose.Schema(
       ref: "User", 
       required: true 
     },
-    // The person whose item triggered the match
+ 
     sender: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "User" 
     },
-    // The actual item that was matched
+    
     item: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "Report" 

@@ -10,11 +10,7 @@ const uploadOnCloudinary = async (filePath) => {
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 
-//   console.log("[Cloudinary] Config:", {
-//     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//     hasKey: !!process.env.CLOUDINARY_API_KEY,
-//     hasSecret: !!process.env.CLOUDINARY_API_SECRET,
-//   });
+
 
   if (!filePath) {
     console.error("[Cloudinary] No file path provided");
@@ -22,15 +18,12 @@ const uploadOnCloudinary = async (filePath) => {
   }
 
   try {
-    // console.log("[Cloudinary] Starting upload for:", filePath);
+  
     const uploadResult = await cloudinary.uploader.upload(filePath);
-    // console.log("[Cloudinary] Upload success:", {
-    //   public_id: uploadResult.public_id,
-    //   secure_url: uploadResult.secure_url,
-    // });
+    
 
     if (fs.existsSync(filePath)) {
-    //   console.log("[Cloudinary] Deleting local file:", filePath);
+   
       fs.unlinkSync(filePath);
     }
 

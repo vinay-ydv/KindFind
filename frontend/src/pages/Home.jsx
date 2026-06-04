@@ -34,7 +34,7 @@ const recentMatches = [
 ]
 
 export function Home() {
-  const navigate = useNavigate(); // Added React Router navigation
+  const navigate = useNavigate(); 
 
   return (
     <div className="space-y-12">
@@ -85,7 +85,7 @@ export function Home() {
         ))}
       </section>
 
-      {/* Features Section */}
+      
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Feature 1 */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 group hover:shadow-md transition-shadow">
@@ -98,7 +98,7 @@ export function Home() {
           </p>
         </div>
 
-        {/* Feature 2 */}
+        
         <div className="bg-white border border-gray-200 rounded-xl p-6 group hover:shadow-md transition-shadow">
           <div className="p-3 rounded-lg bg-blue-50 w-fit mb-4 group-hover:bg-blue-100 transition-colors">
             <MapPin className="h-5 w-5 text-blue-600" />
@@ -109,7 +109,7 @@ export function Home() {
           </p>
         </div>
 
-        {/* Feature 3 */}
+      
         <div className="bg-white border border-gray-200 rounded-xl p-6 group hover:shadow-md transition-shadow">
           <div className="p-3 rounded-lg bg-blue-50 w-fit mb-4 group-hover:bg-blue-100 transition-colors">
             <Bell className="h-5 w-5 text-blue-600" />
@@ -120,7 +120,7 @@ export function Home() {
           </p>
         </div>
 
-        {/* Feature 4 */}
+      
         <div className="bg-white border border-gray-200 rounded-xl p-6 group hover:shadow-md transition-shadow">
           <div className="p-3 rounded-lg bg-blue-50 w-fit mb-4 group-hover:bg-blue-100 transition-colors">
             <Shield className="h-5 w-5 text-blue-600" />
@@ -132,7 +132,7 @@ export function Home() {
         </div>
       </section>
 
-      {/* Recent Success Stories */}
+   
       <section>
         <div className="flex items-center justify-between mb-4">
           <div className="lg:ml-[650px] ml-[70px]">

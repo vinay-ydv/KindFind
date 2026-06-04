@@ -25,11 +25,11 @@ export function Report() {
   const [reportType, setReportType] = useState("lost")
   const [date, setDate] = useState("")
   const [isDragging, setIsDragging] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false) // Added loading state
+  const [isSubmitting, setIsSubmitting] = useState(false) 
 
-  // Separate states for UI preview and actual file (matching your Home.jsx logic)
-  const [uploadedImagePreview, setUploadedImagePreview] = useState(null) // Frontend preview
-  const [imageFile, setImageFile] = useState(null) // Backend file
+
+  const [uploadedImagePreview, setUploadedImagePreview] = useState(null) 
+  const [imageFile, setImageFile] = useState(null) 
 
   const [formData, setFormData] = useState({
     title: "",
@@ -38,9 +38,7 @@ export function Report() {
     location: "",
   })
 
-  // You can bring in your serverUrl from context here if you have it set up globally:
-  // const { serverUrl } = useContext(authDataContext)
-  // Replace/remove if using context
+ 
 
   const handleDragOver = (e) => {
     e.preventDefault()
@@ -64,8 +62,8 @@ export function Report() {
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0]
     if (file) {
-      setImageFile(file) // Store file for backend
-      setUploadedImagePreview(URL.createObjectURL(file)) // Show preview on frontend
+      setImageFile(file) 
+      setUploadedImagePreview(URL.createObjectURL(file)) 
     }
   }
 
@@ -74,7 +72,7 @@ export function Report() {
     setIsSubmitting(true)
     
     try {
-      // 1. Create FormData just like in Home.jsx
+   
       let submitData = new FormData()
       submitData.append("title", formData.title)
       submitData.append("description", formData.description)
@@ -83,27 +81,26 @@ export function Report() {
       submitData.append("reportType", reportType)
       submitData.append("date", date || new Date().toISOString().split('T')[0])
       
-      // Append image if it exists
+      
       if (imageFile) {
         submitData.append("image", imageFile)
       }
 
-      // 2. Make the API call
+      
       let result = await axios.post(`${serverUrl}/api/report/create`, submitData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" }
       })
 
-      // 3. Extract the new item's ID from the response
+     
       const newItemId = result.data.report._id; 
       
-      // console.log("Successfully created ID:", newItemId);
-      // 4. Navigate to matching page with the new ID
+   
       navigate(`/matching/${newItemId}`)
 
     } catch (error) {
       console.error("Error creating report:", error)
-      // Optional: Add some user feedback here (e.g., toast notification)
+     
     } finally {
       setIsSubmitting(false)
     }
@@ -215,7 +212,7 @@ export function Report() {
               </div>
             </div>
 
-            {/* Item Title */}
+          
             <div className="space-y-2">
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">Item Title</label>
               <input
@@ -288,12 +285,11 @@ export function Report() {
               </div>
             </div>
 
-            {/* Location */}
-            {/* Location */}
+          
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">Location</label>
               
-              {/* WE REPLACED THE OLD INPUT WITH THIS: */}
+             
               <LocationAutocomplete 
                 value={formData.location}
                 onChange={(newLocation) => setFormData({ ...formData, location: newLocation })}
@@ -301,7 +297,7 @@ export function Report() {
               
             </div>
 
-            {/* Submit Button */}
+           
             <button
               type="submit"
               disabled={isSubmitting}

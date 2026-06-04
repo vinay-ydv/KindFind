@@ -1,16 +1,15 @@
-import Report from "../models/report.model.js"; // Adjust if your file is named differently
+import Report from "../models/report.model.js"; 
 import uploadOnCloudinary from "../config/cloudinary.js";
 
-// 1. IMPORT THE NEW SDK
+
 import { GoogleGenAI } from "@google/genai";
 
-// 2. INITIALIZE THE NEW CLIENT (It automatically looks for process.env.GEMINI_API_KEY)
+
 const ai = new GoogleGenAI({});
 
-// Helper function to calculate Cosine Similarity for AI matching
 
 
-// Create Report 
+
 export const createReport = async (req, res) => {
   try {
     const { title, description, category, location, reportType, date } = req.body;
@@ -54,7 +53,7 @@ export const createReport = async (req, res) => {
             ]
           });
           
-          // 4. NEW WAY TO GET TEXT (No parenthesis)
+          
           generatedTags = response.text.trim();
           console.log("[createReport] Gemini Ai Tags Generated:", generatedTags);
 
@@ -83,11 +82,11 @@ export const createReport = async (req, res) => {
   }
 };
 
-// Fetch all reports from all users
+
 export const getAllReports = async (req, res) => {
   
   try {
-    // Find all reports, populate author details, and sort newest to oldest
+   
     const reports = await Report.find()
       .populate("author", "-password")
       .sort({ createdAt: -1 });
@@ -104,7 +103,7 @@ export const getAllReports = async (req, res) => {
 };
 
 
-// Fetch ONLY the logged-in user's reports
+
 export const getMyReports = async (req, res) => {
  
   try {
@@ -116,7 +115,7 @@ export const getMyReports = async (req, res) => {
   }
 };
 
-// Delete a report
+
 export const deleteReport = async (req, res) => {
  
   try {
@@ -126,7 +125,7 @@ export const deleteReport = async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
 
-    // Security Check: Make sure the logged-in user actually owns this report
+   
     if (report.author.toString() !== req.userId.toString()) {
       return res.status(403).json({ message: "Unauthorized to delete this report" });
     }
@@ -139,7 +138,7 @@ export const deleteReport = async (req, res) => {
   }
 };
 
-// Update a report
+
 export const updateReport = async (req, res) => {
 
   try {
@@ -147,15 +146,15 @@ export const updateReport = async (req, res) => {
     
     if (!report) return res.status(404).json({ message: "Report not found" });
     
-    // Security Check
+   
     if (report.author.toString() !== req.userId.toString()) {
       return res.status(403).json({ message: "Unauthorized to edit this report" });
     }
 
     const { title, description, category, location, reportType, date } = req.body;
-    let imageUrl = report.image; // Keep existing image by default
+    let imageUrl = report.image; 
 
-    // If a new image was uploaded, process it
+   
     if (req.file) {
       const filePath = req.file.path;
       imageUrl = await uploadOnCloudinary(filePath); // Assuming you still have this imported
@@ -164,7 +163,7 @@ export const updateReport = async (req, res) => {
     const updatedReport = await Report.findByIdAndUpdate(
       req.params.id,
       { title, description, category, location, reportType, date, image: imageUrl },
-      { new: true } // Returns the updated document
+      { new: true } 
     );
 
     return res.status(200).json({ message: "Report updated", report: updatedReport });

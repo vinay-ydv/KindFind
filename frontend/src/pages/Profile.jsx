@@ -6,7 +6,7 @@ import { Navbar } from "../components/Navbar.jsx"
 import { userDataContext } from "../context/UserContext.jsx"
 import { authDataContext } from "../context/AuthContext.jsx"
 
-// Needed for the edit form dropdown
+
 const categories = [
   "Electronics", "Pets", "Wallets", "Keys",
   "Jewelry", "Documents", "Bags", "Clothing", "Other",
@@ -20,14 +20,13 @@ export function Profile() {
   const [myReports, setMyReports] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // --- EDIT MODAL STATES ---
   const [editingReport, setEditingReport] = useState(null) // Holds the report being edited
   const [isUpdating, setIsUpdating] = useState(false)
   const [editFormData, setEditFormData] = useState({})
   const [editImagePreview, setEditImagePreview] = useState(null)
   const [editImageFile, setEditImageFile] = useState(null)
 
-  // Fetch real reports on component mount
+
   useEffect(() => {
     const fetchMyReports = async () => {
       if (!userData) return;
@@ -60,17 +59,17 @@ export function Profile() {
     }
   }
 
-  // --- EDIT REPORT HANDLERS ---
+
   const openEditModal = (report) => {
     setEditingReport(report)
-    // Pre-fill the form with existing data
+    
     setEditFormData({
       title: report.title,
       description: report.description,
       category: report.category,
       location: report.location,
       reportType: report.reportType,
-      // Format date for the input field (YYYY-MM-DD)
+     
       date: new Date(report.date).toISOString().split('T')[0], 
     })
     setEditImagePreview(report.image)
@@ -98,7 +97,7 @@ export function Profile() {
       submitData.append("reportType", editFormData.reportType)
       submitData.append("date", editFormData.date)
       
-      // Only append a new image if the user selected one
+      
       if (editImageFile) {
         submitData.append("image", editImageFile)
       }
@@ -108,12 +107,12 @@ export function Profile() {
         headers: { "Content-Type": "multipart/form-data" }
       })
 
-      // Update the report in our local state so the UI reflects the changes instantly
+      
       setMyReports((prev) => 
         prev.map((item) => item._id === editingReport._id ? response.data.report : item)
       )
       
-      // Close the modal
+      
       setEditingReport(null)
 
     } catch (error) {
@@ -149,7 +148,7 @@ export function Profile() {
       <Navbar />
       <div className="max-w-4xl mx-auto py-12 px-4 space-y-12">
         
-        {/* Centered Profile Header */}
+      
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="h-28 w-28 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white">
             <img 
@@ -169,7 +168,7 @@ export function Profile() {
           </div>
         </div>
 
-        {/* Stats Summary */}
+       
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-sm">
             <p className="text-3xl font-bold text-blue-600">{myReports.length}</p>
@@ -189,7 +188,7 @@ export function Profile() {
           </div>
         </div>
 
-        {/* My Reported Items Section */}
+      
         <div className="space-y-6">
           <h2 className="text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-4 uppercase tracking-tight">
             My Reported Items
@@ -226,10 +225,10 @@ export function Profile() {
                   <div className="flex-1 min-w-0 py-1 flex flex-col justify-between">
                     <div className="relative">
                       
-                      {/* Action Buttons Container */}
+                     
                       <div className="absolute -top-1 -right-1 flex gap-1">
                         
-                        {/* NEW: Find Match Button */}
+                      
                         <button 
                           onClick={() => navigate(`/matching/${item._id}`)}
                           className="flex items-center gap-1 p-1.5 px-2.5 text-xs font-bold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-lg transition-colors mr-1"
@@ -239,7 +238,7 @@ export function Profile() {
                           <span className="hidden sm:inline">Find Match</span>
                         </button>
 
-                        {/* Edit Button */}
+                      
                         <button 
                           onClick={() => openEditModal(item)}
                           className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -248,7 +247,7 @@ export function Profile() {
                           <Edit className="h-4 w-4" />
                         </button>
                         
-                        {/* Delete Button */}
+                      
                         <button 
                           onClick={() => handleDeleteReport(item._id)}
                           className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -258,7 +257,7 @@ export function Profile() {
                         </button>
                       </div>
 
-                      {/* Adjusted pr-28 to ensure the long title doesn't overlap the new button */}
+                      
                       <h3 className="font-bold text-slate-900 pr-[120px] truncate">{item.title}</h3>
                       <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
                         <MapPin className="h-3 w-3" />
@@ -283,7 +282,7 @@ export function Profile() {
           )}
         </div>
 
-        {/* Logout Section */}
+      
         <div className="pt-8 flex justify-center">
           <button 
             onClick={handleLogout}
@@ -295,7 +294,7 @@ export function Profile() {
         </div>
       </div>
 
-      {/* --- EDIT REPORT MODAL --- */}
+     
       {editingReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
@@ -312,7 +311,7 @@ export function Profile() {
 
             <form onSubmit={handleUpdateSubmit} className="p-6 space-y-5">
               
-              {/* Type & Category Row */}
+            
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-gray-700">Report Type</label>
@@ -339,7 +338,7 @@ export function Profile() {
                 </div>
               </div>
 
-              {/* Title */}
+             
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">Title</label>
                 <input
@@ -351,7 +350,7 @@ export function Profile() {
                 />
               </div>
 
-              {/* Description */}
+            
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">Description</label>
                 <textarea
@@ -363,7 +362,7 @@ export function Profile() {
                 />
               </div>
 
-              {/* Location & Date Row */}
+             
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-gray-700">Location</label>
@@ -387,7 +386,7 @@ export function Profile() {
                 </div>
               </div>
 
-              {/* Image Upload */}
+             
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">Update Image (Optional)</label>
                 <div className="flex items-center gap-4">
@@ -411,7 +410,7 @@ export function Profile() {
                 </div>
               </div>
 
-              {/* Submit Buttons */}
+              
               <div className="pt-4 flex gap-3">
                 <button
                   type="button"

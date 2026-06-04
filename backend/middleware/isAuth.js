@@ -8,7 +8,7 @@ const isAuth = async (req, res, next) => {
     try {
         let { token } = req.cookies
 
-        // console.log("TOKEN:", token) // DEBUG
+        // console.log("TOKEN:", token) 
 
         if (!token || token === "undefined") {
             return res.status(401).json({ message: "No token provided" })

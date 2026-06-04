@@ -5,20 +5,20 @@ import { Search, CheckCircle2, XCircle, Sparkles, ArrowLeft, MessageCircle, Plus
 import { ItemCard } from "../components/ItemCard.jsx" 
 import { Navbar } from "../components/Navbar.jsx"
 import { authDataContext } from "../context/AuthContext.jsx" 
-import { userDataContext } from "../context/UserContext.jsx" // <-- ADDED: Need this for chat routing
+import { userDataContext } from "../context/UserContext.jsx" 
 
 export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
   const { id } = useParams() 
   const navigate = useNavigate()
   const { serverUrl } = useContext(authDataContext)
-  const { userData } = useContext(userDataContext) // <-- ADDED: Get current user ID
+  const { userData } = useContext(userDataContext) 
 
-  // Data States
+  
   const [submittedItem, setSubmittedItem] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   
-  // We store the fetched matches here temporarily while the animation runs
+ 
   const [fetchedMatches, setFetchedMatches] = useState([])
 
   // Matching Animation States
@@ -26,7 +26,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
   const [progress, setProgress] = useState(0)
   const [matchedItems, setMatchedItems] = useState([])
 
-  // 1. Fetch the report AND the matches from the AI Backend
+
   useEffect(() => {
     const fetchMatches = async () => {
       if (!id) return;
@@ -35,14 +35,14 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
         setIsLoading(true);
         setError(null);
 
-        // Fetching from your new matching endpoint
+      
         const response = await axios.get(`${serverUrl}/api/matching/findmatches/${id}`, {
           withCredentials: true
         });
 
         setSubmittedItem(response.data.sourceItem);
         
-        // Grab only the top 2 matches to keep the UI clean
+        
         setFetchedMatches(response.data.matches.slice(0, 2));
 
       } catch (err) {
@@ -56,7 +56,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
     fetchMatches();
   }, [id, serverUrl]);
 
-  // 2. The "AI Processing" Animation
+ 
   useEffect(() => {
     if (!submittedItem) return;
 
@@ -94,7 +94,6 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
     }
   }
 
-  // --- UI RENDERING ---
 
   if (isLoading) {
     return (
@@ -150,7 +149,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* LEFT COLUMN: Your Reported Item */}
+         
           <div className="lg:col-span-4 space-y-6">
             <h2 className="text-lg font-bold text-gray-900 border-b pb-2">Your Report</h2>
             
@@ -228,10 +227,10 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Matching Progress & Results */}
+         
           <div className="lg:col-span-8 space-y-6">
             
-            {/* Progress Bar Container */}
+          
             <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -259,7 +258,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
               </div>
             </div>
 
-            {/* Results Section */}
+           
             {matchingPhase === "complete" && (
               <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 
@@ -293,8 +292,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
                             }} 
                           />
                           
-                          {/* Contact Overlay on Hover */}
-                          {/* FIX: Re-added Safe Navigation Logic to Chat Page */}
+                        
                           <div className="absolute inset-x-4 bottom-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                             <button 
                               className="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700 px-3 py-2 rounded-lg text-sm font-bold shadow-md transition-colors cursor-pointer"
@@ -303,7 +301,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
                                 if (typeof onContactUser === 'function') {
                                   onContactUser(item);
                                 } else {
-                                  // Fallback: Directly navigate to messages if prop is missing
+                                  
                                   navigate("/messages", {
                                     state: {
                                       itemId: item._id,
@@ -337,9 +335,9 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
                   </div>
                 )}
 
-                {/* Quick Actions */}
+                
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  {/* FIX: Added explicit cursor-pointer */}
+                  
                   <button 
                     onClick={() => navigate('/report')}
                     className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-3 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"
@@ -348,7 +346,7 @@ export function Matching({ onBack, onViewItem, onContactUser, onBrowse }) {
                     Report Another
                   </button>
                   
-                  {/* FIX: Added Safe Navigation Fallback + cursor-pointer */}
+                
                   <button 
                     onClick={() => {
                       if (typeof onBrowse === 'function') {

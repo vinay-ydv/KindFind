@@ -10,7 +10,7 @@ export function LocationAutocomplete({ value, onChange }) {
   
   const wrapperRef = useRef(null);
 
-  // Keep local query in sync if the parent clears the form
+  
   useEffect(() => {
     if (value === "") {
       setQuery("");
@@ -21,22 +21,20 @@ export function LocationAutocomplete({ value, onChange }) {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setIsOpen(false);
-        // FIX 1: If they click outside without selecting a valid option, 
-        // revert the text box back to the last officially saved value.
-        // We use a functional state update to ensure we have the latest 'value' prop
+    
         setQuery((currentQuery) => {
-           // If they didn't pick anything, clear their gibberish
+       
            return value || "";
         });
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [value]); // Added value to dependency array so it knows the latest valid state
+  }, [value]); 
 
-  // The Debounced API Call
+ 
   useEffect(() => {
-    // Don't search if empty or if the query matches the officially selected value
+ 
     if (!query.trim() || query === value) {
       setSuggestions([]);
       setIsOpen(false);
@@ -61,13 +59,13 @@ export function LocationAutocomplete({ value, onChange }) {
     }, 600);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, value]); // Added value here too
+  }, [query, value]); 
 
   const handleSelect = (suggestion) => {
     const locationName = suggestion.display_name;
-    setQuery(locationName); // Update the visual input
+    setQuery(locationName);
     
-    // FIX 2: THIS is the ONLY place we update the parent component now!
+    
     onChange(locationName); 
     
     setIsOpen(false);
@@ -83,8 +81,7 @@ export function LocationAutocomplete({ value, onChange }) {
           placeholder="Search for a precise location..."
           value={query}
           onChange={(e) => {
-            // FIX 3: Only update the local visual state while typing.
-            // Do NOT call onChange(e.target.value) here anymore.
+          
             setQuery(e.target.value);
           }}
           onFocus={() => {
@@ -97,7 +94,7 @@ export function LocationAutocomplete({ value, onChange }) {
         )}
       </div>
 
-      {/* Dropdown Suggestions */}
+      
       {isOpen && suggestions.length > 0 && (
         <ul className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
           {suggestions.map((item) => (

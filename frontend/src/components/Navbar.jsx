@@ -22,13 +22,11 @@ export function Navbar() {
   const location = useLocation()
   const currentPath = location.pathname
 
-  // ==========================================
-  // FETCH UNREAD COUNTS & LISTEN TO SOCKET
-  // ==========================================
+
   useEffect(() => {
     if (!userData?._id || !serverUrl) return;
 
-    // 1. Function to calculate total unread chat messages
+  
     const fetchUnreadCount = async () => {
       try {
         const res = await axios.get(`${serverUrl}/api/chat/conversations`, { withCredentials: true });
@@ -44,11 +42,11 @@ export function Navbar() {
       }
     };
 
-    // 2. Function to calculate total unread match notifications
+  
     const fetchUnreadNotifs = async () => {
       try {
         const res = await axios.get(`${serverUrl}/api/notifications`, { withCredentials: true });
-        // Filter the array to count only the ones where isRead is false
+        
         const unread = res.data.notifications.filter(n => !n.isRead).length;
         setUnreadNotifs(unread);
       } catch (error) {
@@ -56,22 +54,22 @@ export function Navbar() {
       }
     };
 
-    // Initial Fetch
+   
     fetchUnreadCount(); 
     fetchUnreadNotifs();
 
-    // 3. Socket Connection
+  
     const socket = io(serverUrl);
     socket.on("connect", () => {
       socket.emit("register_user", userData._id);
     });
 
-    // Listen for new chat messages
+   
     socket.on("update_sidebar", () => {
       fetchUnreadCount(); 
     });
 
-    // Listen for new match notifications (Make sure the event name matches your backend!)
+   
     socket.on(`new_notification_${userData._id}`, () => {
       fetchUnreadNotifs();
     });
@@ -79,9 +77,7 @@ export function Navbar() {
     return () => socket.close();
   }, [userData, serverUrl, currentPath]); 
 
-  // ==========================================
-  // OTHER HANDLERS
-  // ==========================================
+  
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -106,7 +102,7 @@ export function Navbar() {
     }
   }
 
-  // First 3 standard nav items
+
   const navItems = [
     { path: "/", label: "Home", icon: Home },
     { path: "/search", label: "Search", icon: List }, 
@@ -117,7 +113,7 @@ export function Navbar() {
     <header className="sticky top-0 mb-2 -mt-4 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         
-        {/* LEFT: LOGO */}
+        
         <div className="w-1/4 flex justify-start">
           <Link to="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
             <img 
@@ -136,7 +132,7 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* CENTER: ALL 5 NAVIGATION LINKS */}
+       
         <nav className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-3">
           {navItems.map((item) => {
             const isActive = currentPath === item.path || (item.path === '/browse' && currentPath.includes('/browse'))
@@ -163,7 +159,7 @@ export function Navbar() {
               currentPath === "/messages" ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             }`}
           >
-            {/* ICON WITH TOP-RIGHT BADGE */}
+            
             <div className="relative flex items-center justify-center">
               <MessageSquare className="h-4 w-4" />
               {unreadCount > 0 && (
@@ -195,10 +191,10 @@ export function Navbar() {
           </Link>
         </nav>
 
-        {/* RIGHT: USER PROFILE & MOBILE MENU TOGGLE */}
+    
         <div className="w-1/4 flex items-center justify-end gap-2">
           
-          {/* User Menu Dropdown */}
+        
           <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -236,7 +232,7 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Toggle */}
+        
           <button
             className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors ml-1"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -246,7 +242,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE MENU DROPDOWN (Shown only on small screens) */}
+   
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-gray-200 bg-white p-4 shadow-inner">
           <nav className="flex flex-col gap-1">
@@ -269,7 +265,7 @@ export function Navbar() {
               )
             })}
             
-            {/* Mobile Messages */}
+           
             <Link
               to="/messages"
               className={`flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
@@ -288,7 +284,7 @@ export function Navbar() {
               Messages
             </Link>
 
-            {/* Mobile Notifications */}
+           
             <Link 
               to="/notifications"
               className={`flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-colors w-full text-left ${

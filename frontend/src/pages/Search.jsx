@@ -4,12 +4,12 @@ import { ItemCard } from "../components/ItemCard.jsx"
 import { Navbar } from "../components/Navbar.jsx"
 import axios from "axios"
 import { authDataContext } from "../context/AuthContext.jsx"
-import { Loader2 } from "lucide-react" // For the loading spinner
+import { Loader2 } from "lucide-react"
 
 export function Search({ onItemClick, searchQuery }) {
   const { serverUrl } = useContext(authDataContext)
   
-  // New States for Real Data
+
   const [items, setItems] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -20,7 +20,7 @@ export function Search({ onItemClick, searchQuery }) {
     dateRange: { from: "", to: "" }, 
   })
 
-  // Fetch all reports when the component loads
+ 
   useEffect(() => {
     const fetchAllItems = async () => {
       try {
@@ -39,9 +39,9 @@ export function Search({ onItemClick, searchQuery }) {
     fetchAllItems()
   }, [serverUrl])
 
-  // Filter the real data
+
   const filteredItems = items.filter((item) => {
-    // Using item.reportType because that's what we called it in the Mongoose Schema
+    
     if (filters.status !== "all" && item.reportType !== filters.status) return false
     if (filters.category && item.category !== filters.category) return false
     if (filters.location && !item.location.toLowerCase().includes(filters.location.toLowerCase())) return false
@@ -49,7 +49,7 @@ export function Search({ onItemClick, searchQuery }) {
     return true
   })
 
-  // Count using reportType
+ 
   const lostCount = items.filter((i) => i.reportType === "lost").length
   const foundCount = items.filter((i) => i.reportType === "found").length
 
@@ -57,7 +57,7 @@ export function Search({ onItemClick, searchQuery }) {
     <div>
       <Navbar />
       
-      {/* Stats Bar */}
+    
       <div className="flex gap-4 mb-6 mt-4 px-4">
         <div className="flex items-center gap-2 text-sm">
           <div className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-sm" />
@@ -69,17 +69,17 @@ export function Search({ onItemClick, searchQuery }) {
         </div>
       </div>
 
-      {/* Filter Bar Component */}
+     
       <FilterBar filters={filters} onFilterChange={setFilters} />
 
-      {/* Results Count */}
+    
       <div className="flex items-center justify-between mb-4 px-5">
         <p className="text-sm text-gray-500">
           Showing <span className="font-semibold text-gray-900">{filteredItems.length}</span> items
         </p>
       </div>
 
-      {/* Loading State */}
+  
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
@@ -87,7 +87,7 @@ export function Search({ onItemClick, searchQuery }) {
         </div>
       ) : (
         <>
-          {/* Items Grid */}
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
             {filteredItems.map((item) => (
               // Use item._id instead of item.id because MongoDB uses _id
@@ -95,7 +95,7 @@ export function Search({ onItemClick, searchQuery }) {
             ))}
           </div>
 
-          {/* Empty State */}
+       
           {filteredItems.length === 0 && (
             <div className="text-center mx-4 py-16 bg-white border border-gray-200 rounded-xl mt-4">
               <div className="mx-auto h-12 w-12 text-gray-300 mb-4">

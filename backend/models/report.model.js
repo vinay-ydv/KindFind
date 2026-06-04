@@ -8,13 +8,13 @@ const reportSchema = new mongoose.Schema({
   },
   reportType: {
     type: String,
-    enum: ["lost", "found"], // Forces it to only be these two values
+    enum: ["lost", "found"], 
     required: true
   },
   title: {
     type: String,
     required: true,
-    trim: true // Removes accidental whitespace at the beginning/end
+    trim: true 
   },
   description: {
     type: String,
@@ -29,7 +29,7 @@ const reportSchema = new mongoose.Schema({
     ]
   },
   date: {
-    type: Date, // Mongoose will automatically convert your frontend 'YYYY-MM-DD' string into a proper Date object
+    type: Date, 
     required: true
   },
   location: {
@@ -37,7 +37,7 @@ const reportSchema = new mongoose.Schema({
     required: true
   },
   image: {
-    type: String, // This will store the Cloudinary/S3 URL when you upload images
+    type: String, 
     default: "",
     required:true
   },
@@ -47,10 +47,10 @@ const reportSchema = new mongoose.Schema({
   },
   matchStatus: {
     type: String,
-    enum: ["searching", "resolved"], // Used for the profile page badges
+    enum: ["searching", "resolved"],
     default: "searching"
   }
-}, { timestamps: true }) // Automatically adds 'createdAt' and 'updatedAt' fields
+}, { timestamps: true }) 
 
 const Report = mongoose.model("Report", reportSchema)
 export default Report

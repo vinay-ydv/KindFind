@@ -1,11 +1,11 @@
 import React, { useEffect, useContext } from "react"
 import { X, MapPin, Calendar, Tag, User, MessageSquare } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { userDataContext } from "../context/UserContext.jsx" // 1. Import Context
+import { userDataContext } from "../context/UserContext.jsx" 
 
 export function ItemDetail({ item, isOpen, onClose }) {
   const navigate = useNavigate();
-  const { userData } = useContext(userDataContext); // 2. Get logged-in user data
+  const { userData } = useContext(userDataContext); 
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -24,19 +24,19 @@ export function ItemDetail({ item, isOpen, onClose }) {
 
   const badgeColor = statusColors[item?.reportType?.toLowerCase()] || statusColors.lost
 
-  // 3. Securely navigate and pass state to the Chat page
+
   const handleContactReporter = () => {
     if (!item || !userData) return;
 
-    onClose(); // Close the modal first
+    onClose(); 
 
-    // Notice we use /messages to match your App.jsx routes!
+
     navigate("/messages", { 
       state: {
-        itemId: item._id,           // MongoDB Item ID
-        reporterId: item.author._id,// The person who posted it
-        viewerId: userData._id,     // The person currently logged in
-        itemDetails: item           // We pass the whole item so Chat can display its image/title!
+        itemId: item._id,         
+        reporterId: item.author._id,
+        viewerId: userData._id,     
+        itemDetails: item           
       }
     });
   };

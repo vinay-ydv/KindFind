@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom"
 import axios from "axios"
 import { Search, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2, User } from "lucide-react"
 
-// Assuming your contexts are exported from these paths
+
 import { authDataContext } from '../context/AuthContext.jsx'
 // import { userDataContext } from '../context/UserContext'
 
@@ -59,7 +59,7 @@ function Signup() {
         <span className="text-2xl font-bold text-slate-900">MatchFound</span>
       </div>
 
-      {/* Signup Card */}
+    
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8 sm:p-10">
         
         <div className="text-center mb-8">
@@ -69,7 +69,7 @@ function Signup() {
 
         <form onSubmit={handleSignUp} className="space-y-5">
           
-          {/* First & Last Name Grid */}
+        
           <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">Full Name</label>
@@ -91,7 +91,7 @@ function Signup() {
 
           
 
-          {/* Email Input */}
+     
           <div className="space-y-2">
             <label className="block text-sm font-medium text-slate-700">Email</label>
             <div className="relative">
@@ -107,7 +107,6 @@ function Signup() {
             </div>
           </div>
 
-          {/* Password Input */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-slate-700">Password</label>
             <div className="relative">
@@ -130,7 +129,7 @@ function Signup() {
             </div>
           </div>
 
-          {/* Error Message Alert */}
+        
           {err && (
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
               <AlertCircle className="h-4 w-4 shrink-0" />
@@ -138,7 +137,7 @@ function Signup() {
             </div>
           )}
 
-          {/* Submit Button */}
+          
           <button
             type="submit"
             disabled={loading}
@@ -155,7 +154,7 @@ function Signup() {
           </button>
         </form>
 
-        {/* Redirect to Login */}
+      
         <p className="text-center text-sm text-slate-500 mt-8">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700 hover:underline">
