@@ -124,10 +124,10 @@ export function Navbar() {
             <div className="hidden sm:flex flex-col justify-center">
               <span className="text-sm font-black leading-none text-blue-600">
                 {/* Kind */}
-                Centralized
+                Kind
               </span>
               <span className="text-[13px] font-bold leading-none tracking-[0.15em] text-gray-500 uppercase mt-0.5">
-                Finder
+                Find
               </span>
             </div>
           </Link>
